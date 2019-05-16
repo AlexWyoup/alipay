@@ -1,0 +1,47 @@
+农信银相关
+ Object request = XposedHelpers.newInstance(XposedHelpers.findClass("com.buybal.buybalpay.util.RequestNetutils", FKH.classLoader), FKH.this.thisobject);
+                    Object okHttpHelp = XposedHelpers.newInstance(XposedHelpers.findClass("com.buybal.buybalpay.net.okhttputil.OkhttpHelper", FKH.classLoader), new Object[0]);
+                    String r1 = (String) XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.buybal.buybalpay.util.RequestUtils", FKH.classLoader), "getReciveAmt", FKH.this.thisobject,
+                            XposedHelpers.getObjectField(request, "a"), money, mark);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("https://nxt.nongxinyin.com/fvp-qp/qp.do?reqJson=");
+                    stringBuilder.append(URLEncoder.encode(r1));
+                    r1 = stringBuilder.toString();
+                    final Object callMethod = XposedHelpers.callMethod(okHttpHelp, "getAsyHttp", r1);
+
+
+                    new Thread() {
+                        public void run() {
+                            super.run();
+                            try {
+                                Object execute = XposedHelpers.callMethod(callMethod, "execute", new Object[0]);
+                                StringBuilder stringBuilder = new StringBuilder();
+                                stringBuilder.append(XposedHelpers.callMethod(XposedHelpers.callMethod(execute, "body", new Object[0]), "string", new Object[0]));
+                                stringBuilder.append("");
+                                String stringBuilder2 = stringBuilder.toString();
+                                StringBuilder stringBuilder3 = new StringBuilder();
+                              
+                                stringBuilder3.append(stringBuilder2);
+
+                                if (stringBuilder2 == null || stringBuilder2.length() <= 0) {
+                                    stringBuilder2 = "ERROR";
+                                }
+                                Intent intent = new Intent();
+                                intent.putExtra("url", JSONObject.parseObject(stringBuilder2).getString("codeUrl"));
+
+                                intent.putExtra("mark", String.valueOf(mark));
+                                intent.putExtra("money", String.valueOf(money));
+                                intent.putExtra("time", "0");
+                                intent.putExtra("extra", JSON.toJSONString(stringBuilder2));
+                                intent.putExtra("type", 5);
+                                intent.putExtra("no", JSONObject.parseObject(stringBuilder2).getString("seq"));
+                                intent.putExtra("mobilePhone", XposedHelpers.callMethod(XposedHelpers.getObjectField(FKH.this.thisobject, "e"), "getPhoneNum", new Object[0]).toString());
+                                intent.putExtra("userName", XposedHelpers.callMethod(XposedHelpers.getObjectField(FKH.this.thisobject, "e"), "getPhoneNum", new Object[0]).toString());
+                                intent.putExtra("userIdcard", XposedHelpers.callMethod(XposedHelpers.getObjectField(FKH.this.thisobject, "e"), "getPhoneNum", new Object[0]).toString());
+                                intent.setAction("store.imea1.result");
+                                context2.sendBroadcast(intent);
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
